@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Angel Market Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #020617;
+            color: #e5e7eb;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .card {
+            background: #020617;
+            border: 1px solid #1e293b;
+            padding: 30px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 0 40px rgba(0, 0, 0, .6);
+        }
+
+        a {
+            display: block;
+            margin-top: 15px;
+            color: #38bdf8;
+            text-decoration: none;
+            font-size: 18px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="card">
+        <h2>🚀 Market Dashboard API</h2>
+        <p>Live market data & candles</p>
+        <a href="/api/status">📊 Market Status</a>
+        <a href="/api/candles">📈 Candle Data</a>
+    </div>
+
+
+    <script>
+        async function loadCandles() {
+            const res = await fetch("/api/candles", {
+                headers: {
+                    "x-api-key": "MY_SUPER_SECRET_KEY_123"
+                }
+            });
+            const data = await res.json();
+            console.log(data);
+        }
+
+        loadCandles();
+    </script>
+
+
+</body>
+
+</html>
