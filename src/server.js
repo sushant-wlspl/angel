@@ -12,6 +12,11 @@ app.use("/api", apiRoutes);
 
 const PORT = process.env.PORT || 3000;
 
+app.get("/", (req, res) => {
+  res.redirect("/api/status");
+});
+
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
+
 });
