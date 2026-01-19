@@ -1,61 +1,109 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 
 <head>
-    <meta charset="UTF-8" />
-    <title>Angel Market Dashboard</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Live Stock Prices</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background: #020617;
-            color: #e5e7eb;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
+            font-family: Arial;
+            background: #0f172a;
+            color: #e5e7eb
         }
 
-        .card {
-            background: #020617;
-            border: 1px solid #1e293b;
-            padding: 30px;
-            border-radius: 12px;
-            text-align: center;
-            box-shadow: 0 0 40px rgba(0, 0, 0, .6);
+        table {
+            width: 100%;
+            border-collapse: collapse
         }
 
-        a {
-            display: block;
-            margin-top: 15px;
-            color: #38bdf8;
-            text-decoration: none;
-            font-size: 18px;
+        th,
+        td {
+            padding: 8px;
+            border-bottom: 1px solid #334155
+        }
+
+        th {
+            background: #020617;
+            position: sticky;
+            top: 0
         }
     </style>
 </head>
 
 <body>
-    <div class="card">
-        <h2>🚀 Market Dashboard API</h2>
-        <p>Live market data & candles</p>
-        <a href="/api/status">📊 Market Status</a>
-        <a href="/api/candles">📈 Candle Data</a>
-    </div>
 
+    <h2>📈 Real-Time Stock Prices</h2>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Symbol</th>
+                <th>Price</th>
+                <th>Updated</th>
+            </tr>
+        </thead>
+        <tbody id="rows"></tbody>
+    </table>
 
     <script>
-        async function loadCandles() {
-            const res = await fetch("/api/candles", {
-                headers: {
-                    "x-api-key": "MY_SUPER_SECRET_KEY_123"
-                }
-            });
-            const data = await res.json();
-            console.log(data);
-        }
+        const ws = new WebSocket("ws://localhost:3000");
+        const prices = {};
 
-        loadCandles();
+        ws.onmessage = e => {
+            const d = JSON.parse(e.data);
+            if (!d.symbol) return;
+
+            prices[d.symbol] = d;
+            render();
+        };
+
+        function render() {
+            const tbody = document.getElementById("rows");
+            tbody.innerHTML = "";
+
+            Object.values(prices).forEach(p => {
+                tbody.innerHTML += `
+      <tr>
+        <td>${p.symbol}</td>
+        <td>${p.price}</td>
+        <td>${p.time}</td>
+      </tr>
+    `;
+            });
+        }
+    </script>
+
+    <script>
+        const ws = new WebSocket("ws://localhost:3000");
+        const tbody = document.getElementById("rows");
+
+        ws.onopen = () => {
+            addRow("SYSTEM", "WebSocket connected", "");
+        };
+
+        ws.onmessage = e => {
+            const d = JSON.parse(e.data);
+
+            if (d.raw) {
+                addRow(
+                    "RAW",
+                    JSON.stringify(d.data),
+                    d.time
+                );
+                return;
+            }
+
+            addRow(d.symbol, d.price, d.time);
+        };
+
+        function addRow(symbol, price, time) {
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+    <td>${symbol}</td>
+    <td>${price}</td>
+    <td>${time}</td>
+  `;
+            tbody.prepend(tr);
+        }
     </script>
 
 

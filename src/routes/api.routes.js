@@ -1,16 +1,13 @@
 const express = require("express");
 const router = express.Router();
 
-const {
-  getMarketStatus,
-  getCandleData,
-  getIndexPrice
-} = require("../controllers/market.controller");
+const { testApi } = require("../controllers/test.controller");
+const { testAngelLogin } = require("../controllers/angel.controller");
+const { getLTP } = require("../controllers/ltp.controller");
 
-const auth = require("../middleware/auth");
 
-router.get("/status", getMarketStatus);
-router.get("/index-price", getIndexPrice);
-router.get("/candles", auth, getCandleData);
+router.get("/test", testApi);
+router.get("/angel-login", testAngelLogin);
+router.get("/ltp", getLTP);
 
 module.exports = router;

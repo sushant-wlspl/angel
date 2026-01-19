@@ -1,26 +1,39 @@
 const { SmartAPI } = require("smartapi-javascript");
-const totp = require("totp-generator");
+const speakeasy = require("speakeasy");
 
 let smartApi;
-let sessionCreated = false;
+let sessionActive = false;
+let authTokens = {};
 
 async function initAngelSession() {
-  if (sessionCreated) return smartApi;
+  if (sessionActive) return authTokens;
 
   smartApi = new SmartAPI({
     api_key: process.env.ANGEL_API_KEY
   });
 
-  const otp = totp(process.env.ANGEL_TOTP_SECRET);
+  const otp = speakeasy.totp({
+    secret: process.env.ANGEL_TOTP_SECRET,
+    encoding: "base32"
+  });
 
-  await smartApi.generateSession(
+  const session = await smartApi.generateSession(
     process.env.ANGEL_CLIENT_CODE,
-    process.env.ANGEL_SECRET_KEY,
+    process.env.ANGEL_MPIN,
     otp
   );
 
-  sessionCreated = true;
-  return smartApi;
+  if (!session || session.status !== true) {
+    throw new Error(session?.message || "Angel login failed");
+  }
+
+  authTokens = {
+    jwtToken: session.data.jwtToken,
+    feedToken: session.data.feedToken
+  };
+
+  sessionActive = true;
+  return authTokens;
 }
 
 module.exports = { initAngelSession };
