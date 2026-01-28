@@ -1,4 +1,4 @@
-const SmartAPI = require("smartapi-javascript");
+const { SmartAPI } = require("smartapi-javascript");
 require("dotenv").config();
 
 const smartApi = new SmartAPI({
