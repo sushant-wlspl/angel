@@ -196,4 +196,7 @@ app.get("/", async (req, res) => {
     res.send(renderTable(rows));
 });
 
-app.listen(3000, () => console.log("Angel running on http://localhost:3000"));
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Angel running on port ${PORT}`);
+});
